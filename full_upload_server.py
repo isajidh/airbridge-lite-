@@ -3,6 +3,8 @@ import socketserver
 import os
 import sys
 import urllib.parse
+import qrcode
+from PIL import Image
 
 PORT = 8000
 SAVE_DIR = os.path.abspath(os.path.join(os.getcwd(), "../"))  # one level up

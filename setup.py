@@ -21,7 +21,7 @@ def main():
     print(f"\n🔥 AirBridge Lite starting...")
     print(f"🌐 Your Wi-Fi IP: http://{ip}:8000\n")
 
-    server_file = "full_upload_server.py"
+    server_file = "full_upload_server_async_qr.py"
     if not os.path.exists(server_file):
         print(f"❌ Missing {server_file}")
         sys.exit(1)

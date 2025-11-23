@@ -4,11 +4,14 @@ from aiohttp import web
 import os
 import urllib.parse
 import socket
+import qrcode
+from PIL import Image
 
 SAVE_DIR = os.path.abspath(os.path.join(os.getcwd(), "../"))
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 def get_ip():
+    """Detect active local IP."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         s.connect(("8.8.8.8", 80))
@@ -58,10 +61,8 @@ async def handle_upload(request):
     else:
         return web.Response(text="No files uploaded.", content_type="text/html")
 
-
 async def start_server():
     app = web.Application()
-
     app.router.add_get("/", handle_index)
     app.router.add_get("/{filename}", handle_static)
     app.router.add_post("/", handle_upload)
@@ -73,29 +74,35 @@ async def start_server():
     site = web.TCPSite(runner, ip, 8000)
     await site.start()
 
-    print(f"AirBridge Lite (AsyncIO) running at:")
-    print(f"🌐 http://{ip}:8000")
+    url = f"http://{ip}:8000"
+    print(f"AirBridge Lite running at: {url}")
     print(f"📁 Saving files to: {SAVE_DIR}")
     print("Press Ctrl + C to stop the server.")
 
-    return runner   # return runner so we can shut it down
+    # Generate QR code
+    qr = qrcode.QRCode(border=2)
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    try:
+        img.show()  # Opens default image viewer
+    except:
+        img.save("AirBridge_QR.png")
+        print("QR saved as AirBridge_QR.png")
 
+    return runner
 
 async def main():
     runner = await start_server()
 
     try:
-        # Keep running until Ctrl + C
         while True:
             await asyncio.sleep(3600)
-
     except KeyboardInterrupt:
         print("\n🛑 Ctrl + C detected, stopping AirBridge Lite...")
 
-    # Clean shutdown
     await runner.cleanup()
     print("🛑 AirBridge Lite stopped safely.")
-
 
 if __name__ == "__main__":
     asyncio.run(main())
