@@ -6,8 +6,16 @@ import urllib.parse
 import socket
 import qrcode
 from PIL import Image
+import sys
 
-SAVE_DIR = os.path.abspath(os.path.join(os.getcwd(), "../"))
+def get_base_dir():
+    # When running as .exe (PyInstaller)
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    # When running as .py script
+    return os.path.dirname(os.path.abspath(__file__))
+
+SAVE_DIR = os.path.join(get_base_dir(), "uploads")
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 def get_ip():
